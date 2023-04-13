@@ -12,7 +12,7 @@
 {% block 'body' %}
     <nav class="navbar navbar-expand-lg bg-body-tertiary navbar-color" data-bs-theme="dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Type.Event</a>
+            <a class="navbar-brand" href="{% url 'events:manage_event' %}">Type.Event</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
@@ -23,8 +23,8 @@
                         Empresa
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="">Criar novo evento</a></li>
-                        <li><a class="dropdown-item" href="">Gerenciar eventos</a></li>
+                        <li><a class="dropdown-item" href="{% url 'events:new_event' %}">Criar novo evento</a></li>
+                        <li><a class="dropdown-item" href="{% url 'events:manage_event' %}">Gerenciar eventos</a></li>
                     </ul>
                 </li>
                 
@@ -33,7 +33,7 @@
                         Cliente
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="">Meus eventos</a></li>
+                        <li><a class="dropdown-item" href="{% url 'events:manage_event' %}">Meus eventos</a></li>
                         <li><a class="dropdown-item" href="">Meus certificados</a></li>
                     </ul>
                 </li>

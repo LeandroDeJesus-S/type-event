@@ -8,14 +8,15 @@ from django.core.validators import validate_email, FileExtensionValidator
 
 def validate_empty_fields(*fields):
     for field in fields:
-        if field is None:
+        if field is None or field == '':
             raise ValidationError('Não podem haver campos vazios!')
 
 
 def validate_username(username):
     regex = re.compile(r'^(?!^\d+$)[a-zA-Z0-9\s]+$')
-    if not regex.search(username):
+    if not regex.search(username) or len(username) < 2:
         msg = 'O nome de usuário deve conter apenas letras números e espaços'
+        msg += ' e no mínimo 2 caracteres.'
         raise ValidationError(msg)
 
 
