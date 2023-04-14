@@ -1,17 +1,11 @@
-{% extends "bases/base_evento.html" %}
-{% load static %}
-
-{% block 'importacoes' %}
-    <link href="{% static 'evento/css/gerenciar_evento.css' %}" rel="stylesheet">
-{% endblock %}
+{% extends 'gerenciar_evento.html' %}
 
 {% block 'conteudo' %}
     <div class="container">
         <br>
         <div class="row">
-            
             <div class="col-md">
-                <form action="{% url 'events:manage_event' %}" method="GET">
+                <form action="{% url 'clients:meus_eventos' %}" method="GET">
                 <label>Título:</label>
                 <input type="text" placeholder="Título..." class="form-control" name="nome" value={{request.GET.nome}}>
             </div>
@@ -34,7 +28,7 @@
             </tr>
             {% for evento in eventos %}
                 <tr class="{% cycle 'linha' 'linha2' %}">
-                    <td width="10%"><a href="{% url 'events:participantes_evento' evento.id %}"><img width="100%" src="{{evento.logo.url}}"></a></td>
+                    <td width="10%"><a href="{% url 'clients:evento' evento.id %}"><img width="100%" src="{{evento.logo.url}}"></a></td>
                     <td>{{evento.nome}}</td>
                     <td>{{evento.descricao}}</td>
                     <td>{{evento.data_inicio}}</td>

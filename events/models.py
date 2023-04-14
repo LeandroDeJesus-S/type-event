@@ -31,7 +31,8 @@ class Certificado(models.Model):
     participante = models.ForeignKey(User, verbose_name="Participante", 
                                      on_delete=models.DO_NOTHING)
     evento = models.ForeignKey(Evento, verbose_name="Evento", 
-                               on_delete=models.DO_NOTHING)
+                               on_delete=models.DO_NOTHING,
+                               related_name='certificado_evento')
     
     def __str__(self):
         return self.participante.username

@@ -11,4 +11,5 @@ urlpatterns = [
     path('gerar_csv/<int:id>/', views.generate_csv, name="gerar_csv"),
     path('certificados/<int:id>/', views.certificates, name="certificados_evento"),
     path('gerar-certificado/<int:id>/', views.generate_certificate, name="gerar_certificado"),
+    path('buscar-certificado/<int:id>/', views.search_certificate, name="procurar_certificado")
 ]
