@@ -1,7 +1,9 @@
+from io import BytesIO
 from datetime import datetime
 from secrets import token_urlsafe
 import csv
 import os
+import sys
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -9,8 +11,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.conf import settings
+from django.http import Http404
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from PIL import ImageDraw, ImageFont, Image
 
-from .models import Evento
+from .models import Evento, Certificado
 from .validators import validate_search_by_date, validate_search_date_interval
 from utils.validators import (validate_empty_fields, 
                               validate_file_type,
@@ -146,3 +151,66 @@ def generate_csv(request, id):
             writer.writerow(x)
     
     return redirect(f'/media/{token}')
+
+
+@login_required(redirect_field_name='accounts:login')
+def certificates(request, id):
+    evento = get_object_or_404(Evento, id=id)
+    if evento.criador != request.user:
+        raise Http404('Esse evento não é seu')
+    
+    if request.method == "GET":
+        qtd_certificados = evento.participantes.all().count()
+        qtd_certificados -= Certificado.objects.filter(evento=evento).count()
+        context = {'evento': evento, 'qtd_certificados': qtd_certificados}
+        return render(request, 'certificados_evento.html', context)
+
+
+@login_required(redirect_field_name='accounts:login')
+def generate_certificate(request, id):
+    evento = get_object_or_404(Evento, id=id)
+    if not evento.criador == request.user:
+        raise Http404('Esse evento não é seu')
+    
+    path_template = os.path.join(
+        settings.STATICFILES_DIRS[0], 'evento/img/template_certificado.png'
+    )
+    path_font = os.path.join(settings.STATICFILES_DIRS[0], 'fonts/arimo.ttf')
+    
+    for participant in evento.participantes.all():
+        if Certificado.objects.filter(participante=participant).exists():
+            messages.info(request, f'{participant.username} já possui um certificado.')
+            continue
+        
+        img = Image.open(path_template)
+        draw = ImageDraw.Draw(img)
+        font_name = ImageFont.truetype(path_font, 80)
+        font_info = ImageFont.truetype(path_font, 30)
+        
+                                                                    # color
+        draw.text((230, 651), participant.username, font=font_name, fill=(0,0,0))
+        
+        draw.text((765, 779), evento.nome, font=font_info, fill=(0,0,0))
+        draw.text((820, 845), f'{evento.carga_horaria}h', font=font_info, fill=(0,0,0))
+        
+        output = BytesIO()
+        img.save(output, 'PNG', quality=70)
+        
+        output.seek(0)
+        final_img = InMemoryUploadedFile(
+            output, 'ImageField', f'{token_urlsafe(8)}.png', 
+            'image/jpeg', sys.getsizeof(output), None
+        )
+        
+        generated_certificate = Certificado(
+            certificado=final_img,
+            participante=participant,
+            evento=evento,
+        )
+        
+        generated_certificate.save()
+    
+    messages.success(request, 'Certificado gerados com sucesso.')
+    return redirect(
+        reverse('events:certificados_evento', kwargs={'id': evento.id})
+    )

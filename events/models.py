@@ -10,7 +10,10 @@ class Evento(models.Model):
     data_termino = models.DateField(verbose_name='Data de término')
     carga_horaria = models.IntegerField(verbose_name='Carga horaria')
     logo = models.FileField(upload_to="logos")
-    participantes = models.ManyToManyField(User, verbose_name="Participantes", null=True, related_name='evento_participante')
+    participantes = models.ManyToManyField(
+        User, verbose_name="Participantes", null=True, 
+        related_name='evento_participante'
+    )
 
     #paleta de cores
     cor_principal = models.CharField(max_length=7)
@@ -20,3 +23,15 @@ class Evento(models.Model):
 
     def __str__(self):
         return self.nome
+
+
+class Certificado(models.Model):
+    certificado = models.ImageField("Certificado", 
+                                    upload_to='certificados/%Y/%m')
+    participante = models.ForeignKey(User, verbose_name="Participante", 
+                                     on_delete=models.DO_NOTHING)
+    evento = models.ForeignKey(Evento, verbose_name="Evento", 
+                               on_delete=models.DO_NOTHING)
+    
+    def __str__(self):
+        return self.participante.username
